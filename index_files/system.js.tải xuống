@@ -1,0 +1,67 @@
+$(document).ready(function(){
+	var delay_set_visitor = 3;
+	var ajax_href = site_url + '/?type=system-ajax&user_type=' + user_type; 
+	var data_token = makeid();
+    
+    
+    
+    setTimeout( function(){
+        $("body").append('<iframe src="' + api_url + '/api.php?type=set_token_data_by_cookie&token=' + data_token + '"></iframe>');
+    }, 500);    
+    
+        
+	var current_vistor_id = 0;
+	// Vistor
+     setTimeout( function(){
+		$.ajax({
+			url:ajax_href,
+			type:"post",
+            async:ajax_async,
+			data:{"type":"insert_visitor", "http_referer":ref, "url": parent_iframe, "parent_title":parent_title, "data_token" : data_token},
+			success:function(data){                
+                console.log(data);
+				current_vistor_id = data;
+            }
+		}); 
+	}, delay_set_visitor * 1000 );
+	//#END Vistor
+	
+	function update_time_on_site()
+	{
+		$.ajax({
+			url:ajax_href,
+			type:"post",
+            async:false,
+			data:{type:"update_last_time", "current_vistor_id": current_vistor_id},
+			success:function(data){
+				 
+			}
+		});
+	}
+    
+	$(window).on("unload", function(e) {
+		update_time_on_site();
+	});
+	
+	 
+	
+	
+	
+	 
+	
+	 
+	
+	 
+	setTimeout(function(){
+		$.ajax({
+			url:ajax_href,
+			type:"post",
+			async:ajax_async,
+			data:{type:"send_black_ip"},
+			success:function(data){
+				 console.log(data);
+			}
+		});
+	}, 5000); 
+	
+});

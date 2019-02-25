@@ -1,0 +1,134 @@
+$(document).ready(function(){ 
+     
+     var IS_images_parent = "#post-content";
+     
+     var IS_curent_stt = 1;
+     var IS_count_img = $( IS_images_parent + " img").size();
+     
+     if(IS_count_img == 0) return;
+     
+    $( IS_images_parent + " img").css("cursor", "pointer");
+     
+     var IS_to_append = '<link rel="stylesheet" type="text/css" href="' + tpl_url + '/css/ImageSlide.css" media="all" />';
+     $("body").append(IS_to_append);
+     
+     IS_to_append ="\
+                            <div class='is-opacity none'></div>\
+                            <div class='is no-display'>\
+                                <div class='is-main-img'><img src='' /></div>\
+                                <img src='" + tpl_url + "/images/left-arrow.png' class='is-prev-next is-prev' /> \
+                                <img src='" + tpl_url + "/images/right-arrow.png' class='is-prev-next is-next' /> \
+                                <div class='is-other-imgs'></div>\
+                            </div>\
+                         ";
+     $("body").append(IS_to_append);
+     
+     var IS_i = 1;
+     $(IS_images_parent).find("img").each(function(e){
+         
+         $(this).load(function(){
+            $(this).attr("r_w", this.width ).attr("r_h", this.height );
+            
+        });
+        
+        $(this).addClass("is-ori-image-" + IS_i).attr("stt", IS_i);
+        IS_i ++;
+        return;
+         
+         var IS_temp = "<div class='is-other-imgs-item'><img src='" + $(this).attr("src") + "' /></div>";
+         $(".is-other-imgs").append(IS_temp);
+     });
+     
+     
+     
+     $("body").on("click", IS_images_parent + " img", function(e){
+            $(".is-opacity").removeClass("none");
+            $(".is-wrap").removeClass("none");
+            $(".is").removeClass("no-display");
+            
+            var IS_src = $(this).attr("src");
+            $(".is-main-img img").attr("src", IS_src);
+            
+            var IS_w = this.width;
+            var IS_h = this.height;
+            
+            var IS_body_w = $("body").width();
+            var IS_body_h = $("body").height();
+            
+            $(".is").width(IS_w).height(IS_h).css("display", "block").css("left", "calc( 50% - " + IS_w / 2 + "px )").css("top", "calc( 50% - " + IS_h / 2 + "px )");
+            
+            IS_curent_stt = $(this).attr("stt");
+            
+            
+            if(IS_curent_stt >= IS_count_img)
+            {
+               $(".is-next").addClass("none");
+            }
+            else
+            {
+                $(".is-next").removeClass("none");
+            }
+             
+            if(IS_curent_stt <= 1)
+            {
+                $(".is-prev").addClass("none");
+            }
+            
+            else
+            {
+                $(".is-prev").removeClass("none");
+            }
+      });
+      
+      $("body").on("click", ".is-opacity", function(e){
+            $(".is-wrap").addClass("none");
+            $(this).addClass("none");
+            $(".is").addClass("no-display");
+      });
+      
+      $("body").on("click", ".is-next", function(e){
+        
+            if(IS_count_img <= IS_curent_stt)
+            {
+                return;
+            }
+            
+            IS_curent_stt ++ ;
+            
+            $(".is-ori-image-" + IS_curent_stt ).click();
+            
+            
+      });
+      
+      $("body").on("click", ".is-prev", function(e){
+        
+            if(IS_curent_stt <= 1)
+            {
+                return;
+            }
+            
+            IS_curent_stt -- ;
+            
+            $(".is-ori-image-" + IS_curent_stt ).click();
+            
+      });
+      
+      $("body").keyup(function(e){
+         
+            if(e.keyCode == 27)
+            {
+                $(".is-opacity").click()
+            }
+             
+            if(e.keyCode == 37)
+            {
+                $(".is-prev").click()
+            }
+            
+            if(e.keyCode == 39)
+            {
+                $(".is-next").click()
+            }
+      })
+       
+});

@@ -1,0 +1,38 @@
+body {
+    border: 0;
+    background: none;
+}
+.chat-textarea-send{
+	color:#0072bd;
+}
+.admin-user {
+    background: #0072bd;
+    color: #fff;
+    border-radius: 5px 5px 0 0;
+}
+
+.conversation-supporter .name {
+    color: #fff;
+    margin: 5px 0;
+}
+
+.conversation-supporter .image img {
+    border: 2px solid #fff;
+}
+
+.conversation-supporter {
+    box-shadow: none;
+    padding: 7px 10px;
+}
+
+.phone-number {
+    background: #0072bd;
+}
+
+.fill-form {
+	background: #0072bdee;
+}
+
+div::-webkit-scrollbar-thumb {
+    background: #0072bd;
+}

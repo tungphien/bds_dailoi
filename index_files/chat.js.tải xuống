@@ -1,0 +1,317 @@
+setTimeout( function(){
+	//document.getElementById("welcome-sound").play();
+}, delay_welcome_sound );
+
+ 
+
+$(document).ready(function(){
+	// Config
+	
+	
+	// #END Config
+	 
+	
+    var ajax_href = site_url + '/?type=chat-ajax&user_type=' + user_type + '&ref=' + ref; 
+	 
+	var to_user = $("#to_user").val();
+	var current_chat_id = 0;
+	
+    $("body").on("keyup", "#chat-textarea", function(){
+        $(".fill-form").addClass("active");
+    }); 
+	
+	$("body").on("click", "#chat-textarea", function(){
+        $(".fill-form").addClass("active");
+    }); 
+    
+	scrollTop_conversation(10000);
+    
+    //  
+    /*
+    function getCaret(node) {
+      if (node.selectionStart) {
+        return node.selectionStart;
+      } else if (!document.selection) {
+        return 0;
+      }
+    
+      var c = "\001",
+          sel = document.selection.createRange(),
+          dul = sel.duplicate(),
+          len = 0;
+    
+      dul.moveToElementText(node);
+      sel.text = c;
+      len = dul.text.indexOf(c); 
+      sel.moveStart('character',-1);
+      sel.text = "";
+      return len;
+    }
+    */
+	
+	
+
+	
+	// Nhan enter la gui form
+    $("body").on("keyup", "#chat-textarea", function(e){
+        var key_code = e.keyCode;
+          
+        if (key_code == 13) {
+			e.preventDefault();
+            $("#submit").click();
+        }         
+           
+    });    
+	 $("body").on("click", ".chat-textarea-send" , function(e){
+		 $("#submit").click();
+	 });
+	 
+	 $("#submit").click(function(){
+		  
+		 $(".fill-form").find("input, textarea").each(function(){
+			 var _this_val = $(this).val();
+			 var the_name = $(this).attr("the_name");
+			 if( ( _this_val == "" ) || ( _this_val == " " ) )
+			 {
+				 $(this).addClass("required ");
+				 $(this).focus();
+				 alert("Vui lòng nhập " + the_name);
+				 return;
+			 }
+				  
+		 });
+		 setTimeout(function(){
+			 $(".fill-form input, .fill-form textarea").removeClass("required");
+		 }, 300)
+	 });
+	 
+    // #END Nhan enter la gui form
+     
+    // Khi Form duoc gui
+    var chat_stt = 1;
+    $("body").on("submit", "form.conversation-form", function(e){
+        e.preventDefault();
+        //Kiểm tra số ĐT có hợp lệ hay không
+        if($(".fill-form-item-phone input").length>0)
+        {
+            var sdt_val = $(".fill-form-item-phone input").val();
+            sdt_val = "0" + parseInt(sdt_val, 10);
+            if( (sdt_val.length < 10) || (sdt_val.length > 12) )
+            {
+                alert("SĐT không hợp lệ");
+                return;
+            } 
+        }
+        //#END Kiểm tra số ĐT có hợp lệ hay không
+        
+        var _this = $(this);
+        var form_data = $(this).serialize();
+        var this_stt = chat_stt;
+         
+        var chat_content = $("#chat-textarea").val();
+        var the_type = $("#type_send_messenger").val();
+        
+        $("#chat-textarea").val("").focus();
+        
+        if( (chat_content == "") || (chat_content == " ") || ( chat_content == "\n" ) )
+        {
+            //alert("Chưa nhập nội dung");
+            return; 
+        }
+		
+		scrollTop_conversation(10000);
+         
+		var d = new Date();
+		var the_time = d.getHours() + ":" + d.getMinutes();
+		
+        var client_messenger = $(".sample-me-conversion-item").html();
+        client_messenger = client_messenger.replace("@content", chat_content);
+        client_messenger = client_messenger.replace("@stt", chat_stt);
+		client_messenger = client_messenger.replace("@time", the_time);
+        
+        
+		append_chat(client_messenger); 
+        var new_element = $(".new-chat-" + chat_stt);
+         
+		$(".fill-form").remove();
+        
+        $.ajax({
+			url:ajax_href,
+			type:"post",
+            async:ajax_async,
+			data:form_data, 
+			success:function(data){ 
+                 //console.log(data); 
+				var old_user_id = $("#from_user").val();
+				var data_arr = data.split("010516");
+				
+                if(data_arr[0] == 'error')
+                {
+                    alert(data_arr[1]);
+                    return;
+                }
+                
+				$("#from_user").val(data_arr[1]);
+				new_element.replaceWith(data_arr[2]);
+				$("#current_chat_id").val(data_arr[3]);				
+                
+                
+				
+				$("body").append(data_arr[4]);
+				var new_user_id = $("#from_user").val();
+				if(old_user_id != new_user_id ) // Nếu user vừa mới tạo
+				{
+					//setCookie('c_user_name', data_arr[4], 365,  da_id);
+					//setCookie('c_password', data_arr[5], 365,  da_id);
+				}	
+				
+				scrollTop_conversation(10000); 
+				
+				// Nếu là tin nhắn đầu tiên
+				if( old_user_id == "0" )
+				{
+					setTimeout(function(){
+						$.ajax({
+							url:ajax_href,
+							type:"post",
+                            async:ajax_async,
+							data:{"type":"send_new_converstation_email", "from_user":new_user_id, "content" : chat_content, "website":parent_iframe}, 
+							success:function(data){
+								
+							}
+						});
+					}, 100);
+					
+				}
+				// #END Nếu là tin nhắn đầu tiên
+            }
+		}); 
+        chat_stt++; 
+    });
+	
+	//Load number tin nhan cuoi cung
+	function get_chat_history( number )
+	{ 
+		$.ajax({
+			url:ajax_href,
+			type:"post",
+            async:ajax_async,
+			data:{"type":"get_chat_history", "limit":number, "to_user":to_user},
+			success:function(data){                
+                //console.log(data);				
+				var data_arr = data.split("010516");
+				 
+				$("#current_chat_id").val(data_arr[0]);		
+				append_chat(data_arr[1]); 
+				 				
+                 
+                scrollTop_conversation(10000);                 			
+            }
+		}); 
+	}
+	get_chat_history( posts_per_page );
+	// #END Load number tin nhan cuoi cung
+	
+	 
+	//Check tin nhan moi 
+	function check_new_chat()
+	{
+		if($("#from_user").length<1) return;
+		var from_user = $("#from_user").val();
+		
+		    
+		  
+		 
+		if( (from_user == '0') || (from_user == '') || (from_user == ' ') ) return;
+		var random_string = makeid();
+		
+		var highest_file = Math.min(from_user, to_user) + '-' + Math.max(from_user, to_user) + '.txt?v=' + random_string ;
+		
+		$.ajax({
+			url:site_url + "/inc/last-chat/" + highest_file,
+			type:"get",
+            async:ajax_async,
+			data:{"type":"check_new_chat", "current_chat_id":current_chat_id, "to_user":to_user},
+			success:function(data){                
+                var last_chat_id = parseInt(data);
+				current_chat_id = parseInt($("#current_chat_id").val());
+				
+				 
+				 
+				if(last_chat_id > current_chat_id)
+				{  
+					var the_status = 'danhan';
+					if(textarea_focus) the_status = 'daxem';
+					 
+					$.ajax({
+						url:ajax_href,
+						type:"post",
+                        async:ajax_async,
+						data:{"type":"get_new_chat","current_chat_id":current_chat_id,  "to_user":to_user, "the_status":the_status},
+						success:function(data){
+							//console.log(data);
+							var data_arr = data.split("010516");
+							     
+							if( parseInt($("#current_chat_id").val()) >= parseInt( data_arr[0] ) ) return;
+							
+							$("#current_chat_id").val(data_arr[0]);			
+							 
+							  
+							append_chat(data_arr[1]); 
+							
+							scrollTop_conversation(10000);
+							
+							
+							if( true ) //(!document.hasFocus()) && ( send_noti_s >=60 )  
+							{
+								var noti_link = site_url + "?type=chat"
+								if(user_type == "user") noti_link = site_url + "?type=admin-chat&to_user=" + to_user;
+								var notify = new Notification(
+									"[OhChat] Có tin nhắn mới từ " + data_arr[2],
+									{
+										body: data_arr[3] ,
+										icon: cdn_domain + '/inc/images/logo.jpg',
+										tag: noti_link 
+									}
+								);
+								
+								notify.onclick = function () {
+									window.open(this.tag); // Di chuyá»ƒn Ä‘áº¿n trang cho url = tag
+									notify.close();
+								}
+								
+								send_noti_s = 0;
+							}
+							 
+							
+							play_new_chat_audio();
+							
+						}
+					}); 
+				}
+            }
+		}); 
+	} 
+	setInterval(function(){
+		check_new_chat( );
+	}, delay_check_new_chat);
+	
+	//#END Check tin nhan moi
+	
+	function update_last_active_time()
+	{
+		$.ajax({
+			url:ajax_href,
+			type:"post",
+            async:ajax_async,
+			data:{"type":"update_last_active_time"},
+			success:function(data){                
+                       			
+            }
+		}); 
+	}
+	setInterval(function(){
+		update_last_active_time( );
+	}, 10000); 
+     
+});

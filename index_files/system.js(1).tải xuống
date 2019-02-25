@@ -1,0 +1,64 @@
+function makeid() {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 10; i++)
+	text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}
+
+var data_token = makeid();
+
+$(document).ready(function() {
+   // return;
+    var delay_set_visitor = 0; 
+	var ajax_href = site_url + '/inc/?page_type=ajax-system';
+    
+    //$("body").append('<iframe style="display: none;" src="https://app.ohchat.net/api.php?type=set_multi_cookie_to_api"></iframe>');
+    setTimeout( function(){
+        //$("body").append('<iframe style="display:none" src="' + api_url + '/api.php?type=set_token_data_by_cookie&token=' + data_token + '"></iframe>');
+    }, 2000); 
+    
+    /*
+    var current_vistor_id = 0; 
+    // Vistor
+     setTimeout( function(){
+		$.ajax({
+			url:ajax_href,
+			type:"post",
+             async:true,
+			data:{"type":"insert_visitor", "http_referer":ref, "url": current_url, "parent_title":page_title, "data_token" : data_token},
+			success:function(data){                
+                console.log(data);
+				current_vistor_id = data;
+            }
+		}); 
+	}, 4000 );
+	//#END Vistor
+    
+    
+    function update_time_on_site()
+	{
+		$.ajax({
+			url:ajax_href, 
+			type:"post", 
+			async : true,
+			data:{type:"update_last_time", "current_vistor_id": current_vistor_id},
+			success:function(data){
+				 
+			}
+		});
+	} 
+	
+    $(window).on("unload", function(e) {
+		update_time_on_site();
+	});
+	
+	var update_time_on_site_time_out = 1000 * ( Math.floor(Math.random() * 10) + 4 );
+	setInterval(function(){
+		//update_time_on_site();
+	}, update_time_on_site_time_out);
+    
+    */
+});

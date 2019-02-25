@@ -1,0 +1,25 @@
+.hotline-fixed{
+    width: 214px;
+}
+.hotline-fixed{
+    height: 82px;
+    line-height: 27px;
+}
+.hotline-fixed-3 a{
+    margin-left: -50px;
+}
+.hotline-fixed a{
+    text-indent: 0;
+}
+.v-form-fixed-1{
+    background: rgb(94, 174, 54) !important;
+}
+.v-open-form-fixed-1{
+    background: rgb(94, 174, 54) !important;
+}
+.box4-content-title a{
+    color: #6e6a6a;
+}
+#header-wrap-1 .header-banner img {
+    width: auto;
+}

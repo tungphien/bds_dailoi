@@ -1,0 +1,93 @@
+
+function setCookie(cname, cvalue, exdays, path) { var d = new Date(); d.setTime(d.getTime() + (exdays*24*60*60*1000)); var expires = "expires="+ d.toUTCString(); document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/" + path;}
+
+function getCookie(cname) {    var name = cname + "="; var decodedCookie = decodeURIComponent(document.cookie); var ca = decodedCookie.split(';'); for(var i = 0; i <ca.length; i++) {        var c = ca[i];        while (c.charAt(0) == ' ') {c = c.substring(1); }  if (c.indexOf(name) == 0) { return c.substring(name.length, c.length);}    }    return "";}
+
+
+
+var t_url = new URL(window.location.href);
+var ref = t_url.searchParams.get("ref");
+var parent_iframe = t_url.searchParams.get("parent");
+var parent_title = t_url.searchParams.get("the_parent_title");
+
+var ajax_async = true;
+
+
+var send_noti_s = 40;
+
+function makeid() {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 10; i++)
+	text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}
+
+
+var textarea_focus = true ;
+var window_focus = true;
+
+ 
+
+function play_new_chat_audio()
+{
+	if (!$("#chat-textarea").is(':focus'))
+	{
+		document.getElementById("new-chat-sound").play();
+	}
+}
+
+$(document).ready(function(){ 
+	if(textarea_focus) $("#chat-textarea").focus(); 
+	$("#chat-textarea").focus(function(){
+		textarea_focus = true ;
+	}); 
+
+	$("#chat-textarea").focusout(function(){
+		textarea_focus = false  
+	}); 
+	
+	setInterval(function(){
+		send_noti_s++;
+	}, 1000);
+
+});
+
+    
+    
+// Cuon toi cuoi khung chat
+function scrollTop_conversation(top){
+	$(".conversation-list").animate({
+		scrollTop: top
+	}, "slow");
+}
+scrollTop_conversation(9999);
+// #END Cuon toi cuoi khung chat
+
+
+
+// Fix kich thuoc khung hoi thoai
+function set_coversation_demision()
+{
+	var window_h = window.innerHeight;
+	window_h = $(".fixed-demi").outerHeight();
+	$(".wrap-id, body").css("height", (window_h));
+	
+	var window_w = window.innerWidth;
+	//$(".wrap-id, body").css("width", (window_w));
+}
+set_coversation_demision();    
+$( window ).resize(function() {
+	set_coversation_demision();
+});
+// #END Fix kich thuoc khung hoi thoai
+
+var et = 'Đã xảy ra lỗi gì đó';
+function append_chat(data)
+{
+	$(".conversation-list-inner").append(data);
+	if( $(".conversation-list-inner").height() < $(".conversation-list").height() ) $(".conversation-list-inner").addClass("fix-height");
+	else $(".conversation-list-inner").removeClass("fix-height");
+}
